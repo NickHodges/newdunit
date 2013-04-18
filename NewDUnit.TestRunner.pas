@@ -123,7 +123,7 @@ begin
     begin
       if TempAttribute is TestAttribute then
       begin
-        aFixture.AddTest(TTest.Create(TempMethod));
+        aFixture.AddTest(TTest.Create(TempMethod, aFixture));
       end else
       begin
         if TempAttribute is SetupAttribute then
@@ -173,8 +173,8 @@ begin
       try
         InvokeSetup(TempFixture);
         ListenerRunningSetup(TempTest);
-        TempTest.TestMethod.Invoke(TempTest.Fixture, []);
-        TempResult := TTestResult.Create(TempTest.TestName, TempTest.Fixture.ClassName, Passed, '');
+        TempTest.TestMethod.Invoke(TempTest.Fixture.FixtureInstance, []);
+        TempResult := TTestResult.Create(TempTest.TestName, TempTest.Fixture.FixtureClass.ClassName, Passed, '');
         TempTest.SetTestResult(TempResult);
         ListenerTestFinished(TempResult);
       except
@@ -182,11 +182,11 @@ begin
         begin
           if E is ENewDUnitException then
           begin
-            TempResult := TTestResult.Create(TempTest.TestName, TempTest.Fixture.ClassName, Failed, E.Message);
+            TempResult := TTestResult.Create(TempTest.TestName, TempTest.Fixture.FixtureClass.ClassName, Failed, E.Message);
           end else
           begin
             // Exception was unexpected
-            TempResult := TTestResult.Create(TempTest.TestName, TempTest.Fixture.ClassName, Error, E.Message);
+            TempResult := TTestResult.Create(TempTest.TestName, TempTest.Fixture.FixtureClass.ClassName, Error, E.Message);
           end;
           TempTest.SetTestResult(TempResult);
           ListenerTestFinished(TempResult);

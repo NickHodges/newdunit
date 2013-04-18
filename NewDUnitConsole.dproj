@@ -115,6 +115,7 @@
         <DCCReference Include="NewDUnit.Assert.pas"/>
         <DCCReference Include="NewDUnit.Listeners.Base.pas"/>
         <DCCReference Include="Tests.pas"/>
+        <DCCReference Include="NewDUnit.DogFood.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

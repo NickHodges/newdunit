@@ -18,6 +18,7 @@ type
     procedure Setup;
     [TearDown]
     procedure TearDown;
+    [Test]
     procedure Blah;
     [Test]
     procedure TestCreation;
@@ -34,22 +35,22 @@ uses
 
 procedure TTestTTest.Blah;
 begin
-  // Do nothing
+  Assert.IsTrue(False, 'Blah');
 end;
 
 procedure TTestTTest.Setup;
 begin
-
+  FObject := TObject.Create;
 end;
 
 procedure TTestTTest.TearDown;
 begin
-
+  FObject.Free;
 end;
 
 procedure TTestTTest.TestCreation;
 begin
-
+  Assert.IsTrue(FObject <> nil, 'FObject is nil and it should not be');
 end;
 
 initialization

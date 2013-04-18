@@ -16,10 +16,11 @@ type
     ENoTestFixturesFound = class(ENewDUnitException);
 
 type
+  TTestFixture = class;
 
   TTest = class(TInterfacedObject, ITest)
   private
-    FFixture: TObject;
+    FFixture: ITestFixture;
     FMethod: TRttiMethod;
     FName: string;
     FResult: ITestResult;
@@ -28,9 +29,9 @@ type
     function GetEnabled: Boolean;
     procedure SetEnabled(aEnabled: Boolean);
   public
-    constructor Create(aMethod: TRttiMethod);
+    constructor Create(aMethod: TRttiMethod; aFixture: ITestFixture);
     procedure SetTestResult(aResult: ITestResult);
-    function Fixture: TObject;
+    function Fixture: ITestFixture;
     function TestName: string;
     function TestResult: ITestResult;
     property TestMethod: TRttiMethod read GetTestMethod;
@@ -120,20 +121,17 @@ uses
 
 { TTest }
 
-constructor TTest.Create(aMethod: TRttiMethod);
+constructor TTest.Create(aMethod: TRttiMethod; aFixture: ITestFixture);
 begin
   inherited Create;
   FMethod := aMethod;
   FName := FMethod.Name;
   FEnabled := True;
+  FFixture := aFixture;
 end;
 
-function TTest.Fixture: TObject;
+function TTest.Fixture: ITestFixture;
 begin
-  if FFixture = nil then
-  begin
-    FFixture := FMethod.Parent.AsInstance.MetaclassType.Create
-  end;
   Result := FFixture;
 end;
 

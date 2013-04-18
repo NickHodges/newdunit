@@ -29,12 +29,14 @@ type
     function Results: IEnumerable<ITestResult>;
   end;
 
+  ITestFixture = interface;
+
   ITest = interface
   ['{01630F7C-4EC7-4E6A-A1E9-0C032E0DF2E4}']
     function GetEnabled: Boolean;
     procedure SetEnabled(aEnabled: Boolean);
     function GetTestMethod: TRttiMethod;
-    function Fixture: TObject;
+    function Fixture: ITestFixture;
     function TestName: string;
     procedure SetTestResult(aResult: ITestResult);
     function TestResult: ITestResult;

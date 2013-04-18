@@ -14,7 +14,8 @@ uses
   NewDUnit.Listeners.Console in 'NewDUnit.Listeners.Console.pas',
   NewDUnit.Assert in 'NewDUnit.Assert.pas',
   NewDUnit.Listeners.Base in 'NewDUnit.Listeners.Base.pas',
-  Tests in 'Tests.pas';
+  Tests in 'Tests.pas',
+  NewDUnit.DogFood in 'NewDUnit.DogFood.pas';
 
 procedure RunTests;
 var
