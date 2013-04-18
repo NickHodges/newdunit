@@ -116,7 +116,7 @@ var
   TempAttribute: TCustomAttribute;
 begin
   TArgument.CheckNotNull(aFixture, 'aFixture');
-  TempType := Context.GetType(aFixture.FixtureInstance);
+  TempType := Context.GetType(aFixture.FixtureClass);
   for TempMethod in TempType.GetMethods do
   begin
     for TempAttribute in TempMethod.GetAttributes do
@@ -163,7 +163,7 @@ begin
   Result := GetTestFixtures;
   if Result.Fixtures.Count <= 0 then
   begin
-    raise ENoTestFixturesFoune.Create('No Test Fixtures were found in this binary.');
+    raise ENoTestFixturesFound.Create('No Test Fixtures were found in this binary.');
   end;
   for TempFixture in Result.Fixtures do
   begin
@@ -202,80 +202,56 @@ end;
 
 procedure TTestRunner.InvokeSetupFixture(aFixture: ITestFixture);
 var
-  TempObj: TObject;
   TempMethod: TRttiMethod;
 begin
   TArgument.CheckNotNull(aFixture, 'aFixture');
   if aFixture.SetupFixtureMethods <> nil then
   begin
-    TempObj := aFixture.FixtureInstance.Create;
-    try
-      for TempMethod in aFixture.SetupFixtureMethods do
-      begin
-        TempMethod.Invoke(TempObj, []);
-      end;
-    finally
-      TempObj.Free;
+    for TempMethod in aFixture.SetupFixtureMethods do
+    begin
+      TempMethod.Invoke(aFixture.FixtureInstance, []);
     end;
   end;
 end;
 
 procedure TTestRunner.InvokeSetup(aFixture: ITestFixture);
 var
-  TempObj: TObject;
   TempMethod: TRttiMethod;
 begin
   TArgument.CheckNotNull(aFixture, 'aFixture');
   if aFixture.SetupMethods <> nil then
   begin
-    TempObj := aFixture.FixtureInstance.Create;
-    try
-      for TempMethod in aFixture.SetupMethods do
-      begin
-        TempMethod.Invoke(TempObj, []);
-      end;
-    finally
-      TempObj.Free;
+    for TempMethod in aFixture.SetupMethods do
+    begin
+      TempMethod.Invoke(aFixture.FixtureInstance, []);
     end;
   end;
 end;
 
 procedure TTestRunner.InvokeTearDownFixture(aFixture: ITestFixture);
 var
-  TempObj: TObject;
   TempMethod: TRttiMethod;
 begin
   TArgument.CheckNotNull(aFixture, 'aFixture');
   if aFixture.TearDownFixtureMethods <> nil then
   begin
-    TempObj := aFixture.FixtureInstance.Create;
-    try
-      for TempMethod in aFixture.TearDownFixtureMethods do
-      begin
-        TempMethod.Invoke(TempObj, [])
-      end;
-    finally
-      TempObj.Free;
+    for TempMethod in aFixture.TearDownFixtureMethods do
+    begin
+      TempMethod.Invoke(aFixture.FixtureInstance, [])
     end;
   end;
 end;
 
 procedure TTestRunner.InvokeTearDown(aFixture: ITestFixture);
 var
-  TempObj: TObject;
   TempMethod: TRttiMethod;
 begin
   TArgument.CheckNotNull(aFixture, 'aFixture');
   if aFixture.TearDownMethods <> nil then
   begin
-    TempObj := aFixture.FixtureInstance.Create;
-    try
-      for TempMethod in aFixture.TearDownMethods do
-      begin
-        TempMethod.Invoke(TempObj, [])
-      end;
-    finally
-      TempObj.Free;
+    for TempMethod in aFixture.TearDownMethods do
+    begin
+      TempMethod.Invoke(aFixture.FixtureInstance, [])
     end;
   end;
 end;

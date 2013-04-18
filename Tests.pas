@@ -24,9 +24,6 @@ type
     procedure TestEqualsInt;
     [Test]
     procedure TestEqualsStr;
-
-
-
   end;
 
   [TestFixture]

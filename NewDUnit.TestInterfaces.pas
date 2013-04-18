@@ -60,7 +60,8 @@ type
     function TearDownFixtureMethods: IEnumerable<TRttiMethod>;
 
     function Name: string;
-    function FixtureInstance: TClass;
+    function FixtureClass: TClass;
+    function FixtureInstance: TObject;
     procedure AddTest(aTest: ITest);
     function Tests: IEnumerable<ITest>;
   end;

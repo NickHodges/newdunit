@@ -13,7 +13,7 @@ uses
 type
   ENewDUnitException = class(Exception);
     ETestMethodHasArguments = class(ENewDUnitException);
-    ENoTestFixturesFoune = class(ENewDUnitException);
+    ENoTestFixturesFound = class(ENewDUnitException);
 
 type
 
@@ -50,6 +50,7 @@ type
   private
     FName: string;
     FClass: TClass;
+    FInstance: TObject;
     FTests: ITests;
     FSetupMethods: IList<TRttiMethod>;
     FTearDownMethods: IList<TRttiMethod>;
@@ -57,6 +58,7 @@ type
     FTearDownFixtureMethods: IList<TRttiMethod>;
   public
     constructor Create(aClass: TClass);
+    destructor Destroy; override;
     procedure AddSetupMethod(aValue: TRttiMethod);
     procedure AddTearDownMethod(aValue: TRttiMethod);
     function SetupMethods: IEnumerable<TRttiMethod>;
@@ -67,7 +69,8 @@ type
     function TearDownFixtureMethods: IEnumerable<TRttiMethod>;
 
     function Name: string;
-    function FixtureInstance: TClass;
+    function FixtureClass: TClass;
+    function FixtureInstance: TObject;
     procedure AddTest(aTest: ITest);
     function Tests: IEnumerable<ITest>;
   end;
@@ -177,11 +180,18 @@ begin
   inherited Create;
   FName := aClass.ClassName;
   FClass := aClass;
+  FInstance := aClass.Create;
   FTests := TTests.Create;
   FSetupMethods := TCollections.CreateList<TRttiMethod>;
   FTearDownMethods := TCollections.CreateList<TRttiMethod>;
   FSetupFixtureMethods := TCollections.CreateList<TRttiMethod>;
   FTearDownFixtureMethods := TCollections.CreateList<TRttiMethod>;
+end;
+
+destructor TTestFixture.Destroy;
+begin
+  FInstance.Free;
+  inherited Destroy;
 end;
 
 procedure TTestFixture.AddSetupFixtureMethod(aValue: TRttiMethod);
@@ -224,9 +234,14 @@ begin
   Result := FTearDownMethods;
 end;
 
-function TTestFixture.FixtureInstance: TClass;
+function TTestFixture.FixtureClass: TClass;
 begin
   Result := FClass;
+end;
+
+function TTestFixture.FixtureInstance: TObject;
+begin
+  Result := FInstance;
 end;
 
 function TTestFixture.Name: string;
