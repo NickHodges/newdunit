@@ -1,0 +1,60 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{AA260CB4-5D43-4720-A224-9B39B25E60B5}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="NewDUnit.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="NewDUnitGUI.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="NewDUnitConsole.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="NewDUnit">
+        <MSBuild Projects="NewDUnit.dproj"/>
+    </Target>
+    <Target Name="NewDUnit:Clean">
+        <MSBuild Projects="NewDUnit.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="NewDUnit:Make">
+        <MSBuild Projects="NewDUnit.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="NewDUnitGUI">
+        <MSBuild Projects="NewDUnitGUI.dproj"/>
+    </Target>
+    <Target Name="NewDUnitGUI:Clean">
+        <MSBuild Projects="NewDUnitGUI.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="NewDUnitGUI:Make">
+        <MSBuild Projects="NewDUnitGUI.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="NewDUnitConsole">
+        <MSBuild Projects="NewDUnitConsole.dproj"/>
+    </Target>
+    <Target Name="NewDUnitConsole:Clean">
+        <MSBuild Projects="NewDUnitConsole.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="NewDUnitConsole:Make">
+        <MSBuild Projects="NewDUnitConsole.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="NewDUnit;NewDUnitGUI;NewDUnitConsole"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="NewDUnit:Clean;NewDUnitGUI:Clean;NewDUnitConsole:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="NewDUnit:Make;NewDUnitGUI:Make;NewDUnitConsole:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>
