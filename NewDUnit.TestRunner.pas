@@ -13,12 +13,6 @@ type
   TTestRunner = class
   private
     FListeners: IList<ITestListener>;
-    procedure GetMethodsForFixture(aFixture: ITestFixture);
-    procedure InvokeSetup(aFixture: ITestFixture);
-    procedure InvokeTearDown(aFixture: ITestFixture);
-    procedure InvokeSetupFixture(aFixture: ITestFixture);
-    procedure InvokeTearDownFixture(aFixture: ITestFixture);
-
     // Listener methods
     procedure ListenerStartTests;
     procedure ListenerFinishTests;
@@ -98,59 +92,12 @@ begin
         if TempAttribute is TestFixtureAttribute then
         begin
           TempFixture := TTestFixture.Create(TempType.AsInstance.MetaclassType);
-          GetMethodsForFixture(TempFixture);
           Result.AddFixture(TempFixture);
         end;
       end;
     end;
   end;
   ListenerFixturesGotten(Result);
-end;
-
-procedure TTestRunner.GetMethodsForFixture(aFixture: ITestFixture);
-// Pass in a fixture, it fills in the tests that the fixture has
-var
-  Context: TRttiContext;
-  TempType: TRttiType;
-  TempMethod: TRttiMethod;
-  TempAttribute: TCustomAttribute;
-begin
-  TArgument.CheckNotNull(aFixture, 'aFixture');
-  TempType := Context.GetType(aFixture.FixtureClass);
-  for TempMethod in TempType.GetMethods do
-  begin
-    for TempAttribute in TempMethod.GetAttributes do
-    begin
-      if TempAttribute is TestAttribute then
-      begin
-        aFixture.AddTest(TTest.Create(TempMethod, aFixture));
-      end else
-      begin
-        if TempAttribute is SetupAttribute then
-        begin
-          aFixture.AddSetupMethod(TempMethod);
-        end else
-        begin
-          if TempAttribute is TearDownAttribute then
-          begin
-            aFixture.AddTearDownMethod(TempMethod);
-          end else
-          begin
-            if TempAttribute is SetupFixtureAttribute then
-            begin
-              aFixture.AddSetupFixtureMethod(TempMethod);
-            end else
-            begin
-              if TempAttribute is TearDownFixtureAttribute then
-              begin
-                aFixture.AddTearDownFixtureMethod(TempMethod);
-              end;
-            end;
-          end;
-        end;
-      end;
-    end;
-  end;
 end;
 
 function TTestRunner.RunTests: ITestFixtures;
@@ -167,94 +114,24 @@ begin
   end;
   for TempFixture in Result.Fixtures do
   begin
-    InvokeSetupFixture(TempFixture);
+    TempFixture.ExecuteFixtureSetup;
     for TempTest in TempFixture.Tests do
     begin
-      try
-        InvokeSetup(TempFixture);
-        ListenerRunningSetup(TempTest);
-        TempTest.TestMethod.Invoke(TempTest.Fixture.FixtureInstance, []);
-        TempResult := TTestResult.Create(TempTest.TestName, TempTest.Fixture.FixtureClass.ClassName, Passed, '');
-        TempTest.SetTestResult(TempResult);
-        ListenerTestFinished(TempResult);
-      except
-        on E: Exception do
-        begin
-          if E is ENewDUnitException then
-          begin
-            TempResult := TTestResult.Create(TempTest.TestName, TempTest.Fixture.FixtureClass.ClassName, Failed, E.Message);
-          end else
-          begin
-            // Exception was unexpected
-            TempResult := TTestResult.Create(TempTest.TestName, TempTest.Fixture.FixtureClass.ClassName, Error, E.Message);
-          end;
-          TempTest.SetTestResult(TempResult);
-          ListenerTestFinished(TempResult);
-        end;
-      end;
-      InvokeTearDown(TempFixture);
+      TempFixture.ExecuteTestSetup;
+      ListenerRunningSetup(TempTest);
+
+      TempResult := TempTest.Execute;
+      ListenerTestFinished(TempResult);
+
+      TempFixture.ExecuteTestTearDown;
       ListenerRunningTearDown(TempTest);
     end;
-    InvokeTearDownFixture(TempFixture);
+    TempFixture.ExecuteFixtureTearDown
   end;
   ListenerFinishTests;
 end;
 
-procedure TTestRunner.InvokeSetupFixture(aFixture: ITestFixture);
-var
-  TempMethod: TRttiMethod;
-begin
-  TArgument.CheckNotNull(aFixture, 'aFixture');
-  if aFixture.SetupFixtureMethods <> nil then
-  begin
-    for TempMethod in aFixture.SetupFixtureMethods do
-    begin
-      TempMethod.Invoke(aFixture.FixtureInstance, []);
-    end;
-  end;
-end;
 
-procedure TTestRunner.InvokeSetup(aFixture: ITestFixture);
-var
-  TempMethod: TRttiMethod;
-begin
-  TArgument.CheckNotNull(aFixture, 'aFixture');
-  if aFixture.SetupMethods <> nil then
-  begin
-    for TempMethod in aFixture.SetupMethods do
-    begin
-      TempMethod.Invoke(aFixture.FixtureInstance, []);
-    end;
-  end;
-end;
-
-procedure TTestRunner.InvokeTearDownFixture(aFixture: ITestFixture);
-var
-  TempMethod: TRttiMethod;
-begin
-  TArgument.CheckNotNull(aFixture, 'aFixture');
-  if aFixture.TearDownFixtureMethods <> nil then
-  begin
-    for TempMethod in aFixture.TearDownFixtureMethods do
-    begin
-      TempMethod.Invoke(aFixture.FixtureInstance, [])
-    end;
-  end;
-end;
-
-procedure TTestRunner.InvokeTearDown(aFixture: ITestFixture);
-var
-  TempMethod: TRttiMethod;
-begin
-  TArgument.CheckNotNull(aFixture, 'aFixture');
-  if aFixture.TearDownMethods <> nil then
-  begin
-    for TempMethod in aFixture.TearDownMethods do
-    begin
-      TempMethod.Invoke(aFixture.FixtureInstance, [])
-    end;
-  end;
-end;
 
 procedure TTestRunner.ListenerStartTests;
 var

@@ -6,11 +6,12 @@ uses
       NewDUnit.Types
     , System.Rtti
     , NewDUnit.TestAttributes
+    , NewDUnit.TestInterfaces
     ;
 
 type
   [TestFixture]
-  TTestTTest = class
+  TCreationTest = class
   private
     FObject: TObject;
   public
@@ -19,10 +20,32 @@ type
     [TearDown]
     procedure TearDown;
     [Test]
-    procedure Blah;
-    [Test]
     procedure TestCreation;
   end;
+
+  [TestFixture]
+  TAssertTest = class
+    [Test]
+    procedure TestIsTrue;
+    [Test]
+    procedure TestIsFalse;
+  end;
+
+
+  [TestFixture]
+  TSample = class
+    [Test]
+    procedure SomeTest;
+  end;
+
+  [TestFixture]
+  TEmptyTearDown = class
+    [Test]
+    procedure SomeTest;
+    [TearDown]
+    procedure EmptyTearDown;
+  end;
+
 
 implementation
 
@@ -33,27 +56,58 @@ uses
 
 { TTestTTest }
 
-procedure TTestTTest.Blah;
-begin
-  Assert.IsTrue(False, 'Blah');
-end;
-
-procedure TTestTTest.Setup;
+procedure TCreationTest.Setup;
 begin
   FObject := TObject.Create;
 end;
 
-procedure TTestTTest.TearDown;
+procedure TCreationTest.TearDown;
 begin
   FObject.Free;
 end;
 
-procedure TTestTTest.TestCreation;
+procedure TCreationTest.TestCreation;
 begin
   Assert.IsTrue(FObject <> nil, 'FObject is nil and it should not be');
 end;
 
+{ TAssertTest }
+
+procedure TAssertTest.TestIsFalse;
+begin
+  Assert.IsFalse(False, 'IsFalse failed');
+end;
+
+procedure TAssertTest.TestIsTrue;
+begin
+  Assert.IsTrue(True, 'IsTrue failed');
+end;
+
+{ TFixtureSample }
+
+procedure TSample.SomeTest;
+begin
+  Assert.IsTrue(True);
+end;
+
+{ TEmptyTearDown }
+
+procedure TEmptyTearDown.EmptyTearDown;
+begin
+
+end;
+
+procedure TEmptyTearDown.SomeTest;
+begin
+  Assert.IsFalse(False);
+end;
+
 initialization
-  TTestRegistry.RegisterTest(TTestTTest);
+  TTestRegistry.RegisterTest(TSample);
+  TTestRegistry.RegisterTest(TCreationTest);
+  TTestRegistry.RegisterTest(TAssertTest);
+  TTestRegistry.RegisterTest(TEmptyTearDown);
+
+
 
 end.

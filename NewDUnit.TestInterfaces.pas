@@ -40,6 +40,7 @@ type
     function TestName: string;
     procedure SetTestResult(aResult: ITestResult);
     function TestResult: ITestResult;
+    function Execute: ITestResult;
     property TestMethod: TRttiMethod read GetTestMethod;
     property Enabled: Boolean read GetEnabled write SetEnabled;
   end;
@@ -60,6 +61,13 @@ type
     procedure AddTearDownFixtureMethod(aValue: TRttiMethod);
     function SetupFixtureMethods: IEnumerable<TRttiMethod>;
     function TearDownFixtureMethods: IEnumerable<TRttiMethod>;
+
+    procedure ExecuteFixtureSetup;
+    procedure ExecuteFixtureTearDown;
+
+    procedure ExecuteTestSetup;
+    procedure ExecuteTestTearDown;
+
 
     function Name: string;
     function FixtureClass: TClass;

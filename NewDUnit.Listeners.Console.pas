@@ -8,7 +8,7 @@ uses
     ;
 
 type
-  TExitBehavior = (Continue, Pause, HaltOnFailure);
+  TExitBehavior = (Continue, Pause, HaltWithErrorCode);
 
 
 type
@@ -45,14 +45,11 @@ begin
     Pause: begin
              ReadLn;
            end;
-    HaltOnFailure:
+    HaltWithErrorCode:
            begin
-             Halt(TotalErrors + TotalFailed);
+             Halt(TotalErrors + TotalFailed);  //Could be a non-zero exit code
            end;
   end;
-
-
-
 end;
 
 procedure TConsoleTestListener.OnGetFixturesImpl(aFixtures: ITestFixtures);

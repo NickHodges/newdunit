@@ -35,6 +35,9 @@ begin
     RunTests;
   except
     on E: Exception do
+    begin
       Writeln(E.ClassName, ': ', E.Message);
+      Readln;
+    end;
   end;
 end.

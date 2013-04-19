@@ -15,11 +15,7 @@ type
     [TearDown]
     procedure TearDown;
     [Test]
-    procedure TestMe;
-    [Test]
     procedure TestAgain;
-    [Test]
-    procedure NegativeTest;
     [Test]
     procedure TestEqualsInt;
     [Test]
@@ -30,14 +26,6 @@ type
   TTester = class
     [Test]
     procedure Blah;
-    [Test]
-    procedure WillFail;
-    [Setup]
-    procedure DoingSetup;
-    [SetupFixture]
-    procedure DoSetupFixture;
-    [TearDownFixture]
-    procedure DoTearDownFixture;
     [Test]
     procedure RaiseException;
 
@@ -53,10 +41,6 @@ uses
 
 { TWhatever }
 
-procedure TWhatever.NegativeTest;
-begin
-  Assert.IsFalse(True, 'Failed on purpose');
-end;
 
 procedure TWhatever.Setup;
 begin
@@ -82,11 +66,6 @@ begin
   Assert.AreEquals<string>('this', 'th'+'is');
 end;
 
-procedure TWhatever.TestMe;
-begin
-  Assert.IsTrue(False, 'This is the error message');
-end;
-
 { TTester }
 
 procedure TTester.Blah;
@@ -94,33 +73,16 @@ begin
   Assert.IsTrue(5=3+2, 'Somehow, addition failed');
 end;
 
-procedure TTester.DoingSetup;
-begin
-  //WriteLn('DoingSetup');
-end;
-
-procedure TTester.DoSetupFixture;
-begin
-  //WriteLn('Doing SetupFixture');
-end;
-
-procedure TTester.DoTearDownFixture;
-begin
-  //Writeln('Doing TearDownFixture');
-end;
-
 procedure TTester.RaiseException;
 begin
   raise Exception.Create('Error Message');
 end;
 
-procedure TTester.WillFail;
-begin
-  Assert.IsTrue(False, 'Failed on purpose');
-end;
 
 initialization
-  TTestRegistry.RegisterTest(TWhatever);
   TTestRegistry.RegisterTest(TTester);
+  TTestRegistry.RegisterTest(TWhatever);
+
+
 
 end.

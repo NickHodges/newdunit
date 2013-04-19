@@ -31,6 +31,7 @@ type
   public
     constructor Create(aMethod: TRttiMethod; aFixture: ITestFixture);
     procedure SetTestResult(aResult: ITestResult);
+    function Execute: ITestResult;
     function Fixture: ITestFixture;
     function TestName: string;
     function TestResult: ITestResult;
@@ -57,6 +58,7 @@ type
     FTearDownMethods: IList<TRttiMethod>;
     FSetupFixtureMethods: IList<TRttiMethod>;
     FTearDownFixtureMethods: IList<TRttiMethod>;
+    procedure GetMethodsForFixture;
   public
     constructor Create(aClass: TClass);
     destructor Destroy; override;
@@ -68,6 +70,11 @@ type
     procedure AddTearDownFixtureMethod(aValue: TRttiMethod);
     function SetupFixtureMethods: IEnumerable<TRttiMethod>;
     function TearDownFixtureMethods: IEnumerable<TRttiMethod>;
+
+    procedure ExecuteFixtureSetup;
+    procedure ExecuteFixtureTearDown;
+    procedure ExecuteTestSetup;
+    procedure ExecuteTestTearDown;
 
     function Name: string;
     function FixtureClass: TClass;
@@ -117,6 +124,7 @@ implementation
 
 uses
       System.TypInfo
+    , NewDUnit.TestAttributes
     ;
 
 { TTest }
@@ -128,6 +136,31 @@ begin
   FName := FMethod.Name;
   FEnabled := True;
   FFixture := aFixture;
+end;
+
+function TTest.Execute: ITestResult;
+var
+  TempResult: ITestResult;
+begin
+  try
+    FMethod.Invoke(FFixture.FixtureInstance, []);
+    TempResult := TTestResult.Create(TestName, Fixture.FixtureClass.ClassName, Passed, '');
+    SetTestResult(TempResult);
+  except
+    on E: Exception do
+    begin
+      if E is ENewDUnitException then
+      begin
+        TempResult := TTestResult.Create(TestName, Fixture.FixtureClass.ClassName, Failed, E.Message);
+      end else
+      begin
+        // Exception was unexpected
+        TempResult := TTestResult.Create(TestName, Fixture.FixtureClass.ClassName, Error, E.Message);
+      end;
+      SetTestResult(TempResult);
+    end;
+  end;
+  Result := TestResult;
 end;
 
 function TTest.Fixture: ITestFixture;
@@ -184,12 +217,109 @@ begin
   FTearDownMethods := TCollections.CreateList<TRttiMethod>;
   FSetupFixtureMethods := TCollections.CreateList<TRttiMethod>;
   FTearDownFixtureMethods := TCollections.CreateList<TRttiMethod>;
+  GetMethodsForFixture;
 end;
+
+procedure TTestFixture.GetMethodsForFixture;
+// Pass in a fixture, it fills in the tests that the fixture has
+var
+  Context: TRttiContext;
+  TempType: TRttiType;
+  TempMethod: TRttiMethod;
+  TempAttribute: TCustomAttribute;
+begin
+  TempType := Context.GetType(Self.FixtureClass);
+  for TempMethod in TempType.GetMethods do
+  begin
+    for TempAttribute in TempMethod.GetAttributes do
+    begin
+      if TempAttribute is TestAttribute then
+      begin
+        Self.AddTest(TTest.Create(TempMethod, Self));
+      end else
+      begin
+        if TempAttribute is SetupAttribute then
+        begin
+          Self.AddSetupMethod(TempMethod);
+        end else
+        begin
+          if TempAttribute is TearDownAttribute then
+          begin
+            Self.AddTearDownMethod(TempMethod);
+          end else
+          begin
+            if TempAttribute is SetupFixtureAttribute then
+            begin
+              Self.AddSetupFixtureMethod(TempMethod);
+            end else
+            begin
+              if TempAttribute is TearDownFixtureAttribute then
+              begin
+                Self.AddTearDownFixtureMethod(TempMethod);
+              end;
+            end;
+          end;
+        end;
+      end;
+    end;
+  end;
+end;
+
 
 destructor TTestFixture.Destroy;
 begin
   FInstance.Free;
   inherited Destroy;
+end;
+
+procedure TTestFixture.ExecuteFixtureSetup;
+var
+  TempMethod: TRttiMethod;
+begin
+  if SetupFixtureMethods <> nil then
+  begin
+    for TempMethod in SetupFixtureMethods do
+    begin
+      TempMethod.Invoke(FixtureInstance, []);
+    end;
+  end;
+end;
+procedure TTestFixture.ExecuteFixtureTearDown;
+var
+  TempMethod: TRttiMethod;
+begin
+  if TearDownFixtureMethods <> nil then
+  begin
+    for TempMethod in TearDownFixtureMethods do
+    begin
+      TempMethod.Invoke(FixtureInstance, [])
+    end;
+  end;
+end;
+procedure TTestFixture.ExecuteTestSetup;
+var
+  TempMethod: TRttiMethod;
+begin
+  if SetupMethods <> nil then
+  begin
+    for TempMethod in SetupMethods do
+    begin
+      TempMethod.Invoke(FixtureInstance, []);
+    end;
+  end;
+end;
+
+procedure TTestFixture.ExecuteTestTearDown;
+var
+  TempMethod: TRttiMethod;
+begin
+  if TearDownMethods <> nil then
+  begin
+    for TempMethod in TearDownMethods do
+    begin
+      TempMethod.Invoke(FixtureInstance, [])
+    end;
+  end;
 end;
 
 procedure TTestFixture.AddSetupFixtureMethod(aValue: TRttiMethod);
