@@ -119,6 +119,11 @@
         <DCCReference Include="NewDUnit.Listeners.Base.pas"/>
         <DCCReference Include="Tests.pas"/>
         <DCCReference Include="NewDUnit.DogFood.pas"/>
+        <DCCReference Include="NewDUnit.Exceptions.pas"/>
+        <DCCReference Include="NewDUnit.xUnitXMLFormat.pas"/>
+        <DCCReference Include="NewDUnit.Listeners.XML.pas">
+            <ContainerId>WebFile</ContainerId>
+        </DCCReference>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

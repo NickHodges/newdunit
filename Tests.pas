@@ -53,7 +53,7 @@ end;
 
 procedure TWhatever.TestAgain;
 begin
-  Assert.IsTrue(True);
+  Assert.IsTrue(True, 'Holy crap!  True is not true!');
 end;
 
 procedure TWhatever.TestEqualsInt;
@@ -63,7 +63,7 @@ end;
 
 procedure TWhatever.TestEqualsStr;
 begin
-  Assert.AreEquals<string>('this', 'th'+'is');
+  Assert.AreEquals<string>('this', 'th'+'is', 'String concatenation failed');
 end;
 
 { TTester }

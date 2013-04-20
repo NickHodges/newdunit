@@ -3,23 +3,20 @@ unit NewDUnit.Types;
 interface
 
 uses
-      System.SysUtils
-    , System.Rtti
+
+      System.Rtti
     , Spring
     , Spring.Collections
     , NewDUnit.TestInterfaces
     ;
 
-type
-  ENewDUnitException = class(Exception);
-    ETestMethodHasArguments = class(ENewDUnitException);
-    ENoTestFixturesFound = class(ENewDUnitException);
 
 type
   TTestFixture = class;
 
   TTest = class(TInterfacedObject, ITest)
   private
+    [Weak]
     FFixture: ITestFixture;
     FMethod: TRttiMethod;
     FName: string;
@@ -110,21 +107,14 @@ type
     property ErrorMessage: string read GetErrorMessage write SetErrorMessage;
   end;
 
-  TTestResults = class(TInterfacedObject, ITestResults)
-  private
-    FResults: IList<ITestResult>;
-  public
-    constructor Create;
-    procedure AddResult(aResult: ITestResult);
-    function Results: IEnumerable<ITestResult>;
-  end;
-
 
 implementation
 
 uses
       System.TypInfo
+    , System.SysUtils
     , NewDUnit.TestAttributes
+    , NewDUnit.Exceptions
     ;
 
 { TTest }
@@ -425,25 +415,6 @@ end;
 function TTestResult.TestName: string;
 begin
   Result := FName;
-end;
-
-{ TTestResults }
-
-procedure TTestResults.AddResult(aResult: ITestResult);
-begin
-  FResults.Add(aResult);
-end;
-
-constructor TTestResults.Create;
-begin
-  inherited Create;
-  FResults := TCollections.CreateList<ITestResult>;
-end;
-
-
-function TTestResults.Results: IEnumerable<ITestResult>;
-begin
-  Result := FResults;
 end;
 
 { TTestFixtures }

@@ -31,7 +31,6 @@ type
     procedure TestIsFalse;
   end;
 
-
   [TestFixture]
   TSample = class
     [Test]
@@ -44,6 +43,19 @@ type
     procedure SomeTest;
     [TearDown]
     procedure EmptyTearDown;
+  end;
+
+    [TestFixture]
+  TTestTTestFixtures = class
+  private
+    FTestFixtures: TTestFixtures;
+  public
+    [Setup]
+    procedure Setup;
+    [TearDown]
+    procedure TearDown;
+    [Test]
+    procedure TestCreation;
   end;
 
 
@@ -102,12 +114,29 @@ begin
   Assert.IsFalse(False);
 end;
 
+
+{ TTestTTestFixtures }
+
+procedure TTestTTestFixtures.Setup;
+begin
+  FTestFixtures := TTestFixtures.Create;
+end;
+
+procedure TTestTTestFixtures.TearDown;
+begin
+  FTestFixtures.Free;
+end;
+
+procedure TTestTTestFixtures.TestCreation;
+begin
+  Assert.IsNotNil(FTestFixtures);
+end;
+
 initialization
   TTestRegistry.RegisterTest(TSample);
   TTestRegistry.RegisterTest(TCreationTest);
   TTestRegistry.RegisterTest(TAssertTest);
   TTestRegistry.RegisterTest(TEmptyTearDown);
-
-
+  TTestRegistry.RegisterTest(TTestTTestFixtures);
 
 end.

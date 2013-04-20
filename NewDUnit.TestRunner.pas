@@ -34,6 +34,7 @@ uses
     , System.SysUtils
     , System.TypInfo
     , NewDUnit.TestAttributes
+    , NewDUnit.Exceptions
     ;
 
 { TTestRunner }
@@ -117,12 +118,13 @@ begin
     TempFixture.ExecuteFixtureSetup;
     for TempTest in TempFixture.Tests do
     begin
+      // Setup
       TempFixture.ExecuteTestSetup;
       ListenerRunningSetup(TempTest);
-
+      // Run
       TempResult := TempTest.Execute;
       ListenerTestFinished(TempResult);
-
+      // TearDown
       TempFixture.ExecuteTestTearDown;
       ListenerRunningTearDown(TempTest);
     end;
@@ -130,8 +132,6 @@ begin
   end;
   ListenerFinishTests;
 end;
-
-
 
 procedure TTestRunner.ListenerStartTests;
 var
@@ -164,7 +164,6 @@ begin
   begin
     TempListener.OnTearDown(aTest);
   end;
-
 end;
 
 procedure TTestRunner.ListenerTestFinished(aResult: ITestResult);

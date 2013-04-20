@@ -15,7 +15,10 @@ uses
   NewDUnit.Assert in 'NewDUnit.Assert.pas',
   NewDUnit.Listeners.Base in 'NewDUnit.Listeners.Base.pas',
   Tests in 'Tests.pas',
-  NewDUnit.DogFood in 'NewDUnit.DogFood.pas';
+  NewDUnit.DogFood in 'NewDUnit.DogFood.pas',
+  NewDUnit.Exceptions in 'NewDUnit.Exceptions.pas',
+  NewDUnit.xUnitXMLFormat in 'NewDUnit.xUnitXMLFormat.pas',
+  NewDUnit.Listeners.XML in 'NewDUnit.Listeners.XML.pas';
 
 procedure RunTests;
 var
@@ -40,4 +43,5 @@ begin
       Readln;
     end;
   end;
+
 end.
