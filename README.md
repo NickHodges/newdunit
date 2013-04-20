@@ -1,1 +1,1 @@
-New DUnit is an attribute-based TDD Framework for Delphi.
+NewDUnit is an attribute-based TDD Framework for Delphi.
